@@ -1,7 +1,7 @@
 
 // Variables ---------------------------------------------
 let font;
-let state = 19;
+let state = 0;
 let typed = "";
 
 let money = false; // Checks if you brought money from the safe
