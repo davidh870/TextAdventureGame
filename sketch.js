@@ -1,7 +1,7 @@
 
 // Variables ---------------------------------------------
 let font;
-let state = 0;
+let state = 19;
 let typed = "";
 
 let money = false; // Checks if you brought money from the safe
@@ -32,6 +32,18 @@ let registerImg;
 let bloodShotImg;
 let winnerImg;
 
+// Sound Variables
+let playButton;
+let playOnce = false;
+let song;
+let babyDriverSound;
+let safeSound;
+let snoringSound;
+let carStopSound;
+let gunCockSound;
+let winSound;
+let soundOn = false;
+
 // Positions of text
 let textPosX;  
 let textPosY;
@@ -54,7 +66,7 @@ let storyText = [/*0*/'You are in a white room. There is nothing but a table acr
 /*15*/'You look at the cash register and then the cashier nervously. The cashier asks you if you are looking for something. You reply saying ....',
 /*16*/'You did not bring any money',
 /*17*/'You drive back home with empty pockets and feel like a failure. You go to bed and sleep your failures away ....',
-/*18*/'You are finally home with empty pockets and feel like a failure. You then remembered you bought a lottery ticket. Impatiently the lottery winners won’t be announced for three more hours. All the driving and nervousness got you tired. ',
+/*18*/'You drive home with empty pockets and feel like a failure. You then remembered you bought a lottery ticket. Impatiently the lottery winners won’t be announced for three more hours. All the driving and nervousness got you tired. ',
 /*19*/'You wake up and see that in a few minutes the winner of the lottery ticket is going to be announced. You anxiously turn on the tv and tune in the channel where they announce the winner. You got excited for a second but then realized that winning is very slim and lost all hope.\n\nIt is finally time! The announcer draws each number one by one. Announcer finished drawing all numbers. You quickly pull out your lottery ticket and start matching each number slowly. Your lottery ticket matched what the announcer drawn. You reassure your lottery ticket again since there is no chance of winning. YOU FREAKING WON!!',
 /*20*/'You pull out your gun and aim at the cashier like a mad man. The cashier shaking like a blender starts pulling out the money slowly trying to buy time. You tell him to hurry up. You look back to see if anyone was in the store.',
 /*21*/'BOOM! You are dead. The cashier shot you.',
@@ -91,7 +103,17 @@ function preload(){
     registerImg = loadImage('images/register.png');
     bloodShotImg = loadImage('images/blood.png');
     winnerImg = loadImage('images/winner.png')
-}
+
+    // Preload sounds
+    song = loadSound("music/creepy.mp3");
+    babyDriverSound = loadSound("music/babyDriver.mp3");
+    safeSound = loadSound("music/safeSound.mp3");
+    snoringSound = loadSound("music/snoringSound.mp3");
+    carStopSound = loadSound("music/carStop.mp3");
+    gunCockSound = loadSound("music/gunCock.mp3");
+    gunShotSound = loadSound("music/gunShot.mp3");
+    winSound = loadSound("music/winSound.mp3");
+}  
 
 function setup(){
     // Setup Canvas
@@ -104,7 +126,33 @@ function setup(){
     textPosX = 4;
     textPosY = height/4;
     fill(255);
+
+    
+
+    // Play / Pause Button
+    playButton = createButton("Play Sound");
+    playButton.mousePressed(togglePlaying);
+
 }
+
+
+// Function for Play Pause Button
+function togglePlaying(){
+    if(song.isPlaying()){
+        song.pause()
+        playButton.html("Play Sound");
+        soundOn = false;
+    }
+    else{
+        song.loop();
+        playButton.html("Pause Sound");
+        soundOn = true;
+        playOnce = false;
+    }
+    
+}
+
+
 
 function draw(){
     background(0); // black Canvas
@@ -127,6 +175,19 @@ function draw(){
     */
 
     if(state == 0){
+        // Sound Control
+        if(soundOn == true){
+            playOnce = false;
+
+            if(snoringSound.isPlaying){
+                snoringSound.stop();
+            }
+            if(carStopSound.isPlaying){
+                carStopSound.stop();
+            }
+        }
+        
+
         text(storyText[state], textPosX, textPosY, 800, 800);
 
         // Load money image
@@ -158,6 +219,16 @@ function draw(){
     else if(state == 3){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!babyDriverSound.isPlaying()){
+                babyDriverSound.loop();
+            }
+        }
+        else{
+            babyDriverSound.pause();
+        }
+
         // Load room door image
         image(roomDoorImg, 300, 10, 200, 200);
 
@@ -188,6 +259,16 @@ function draw(){
     else if(state == 6){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!safeSound.isPlaying()){
+                safeSound.play();
+            }
+        }
+        else{
+            safeSound.pause();
+        }
+
         fill(255, 0, 0); // Red Text for action
         text(hyperlinks[1], textPosX, windowHeight - 400, 800, 800)
 
@@ -196,6 +277,11 @@ function draw(){
     }
     else if(state == 7){
         text(storyText[state], textPosX, textPosY, 800, 800);
+
+        // Sound Control
+        if(safeSound.isPlaying()){
+            safeSound.stop();
+        }
 
         // Load money image
         image(moneyImg, 450, windowHeight / 16, 150, 150);
@@ -218,12 +304,36 @@ function draw(){
     else if(state == 9){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!snoringSound.isPlaying()){
+                snoringSound.loop();
+            }
+        }
+        else{
+            snoringSound.pause();
+        }
+
         fill(255, 0, 0); // Red Text for action
         // start over
         text(hyperlinks[13], textPosX, windowHeight - 400, 800, 800);
     }
     else if(state == 10){
         text(storyText[state], textPosX, textPosY, 800, 800);
+
+        // Sound Controls 
+        if(soundOn == true){
+            if(!carStopSound.isPlaying()){
+                if(playOnce == false){
+                    playOnce = true;
+                    carStopSound.play();
+                }
+                
+            }
+        }
+        else{
+            carStopSound.pause();
+        }
 
         // Load dresser image
         image(gasolineStationImg, 250, 10, 300, 200);
@@ -234,6 +344,13 @@ function draw(){
     }
     else if (state == 11){
         text(storyText[state], textPosX, textPosY, 800, 800);
+
+        // Sound Controls
+        if(soundOn == true){
+            if(carStopSound.isPlaying){
+                carStopSound.stop();
+            }
+        }
 
         fill(255, 0, 0); // Red Text for action
         text(hyperlinks[4], textPosX, windowHeight - 400, 800, 800);
@@ -291,6 +408,20 @@ function draw(){
     else if(state == 17){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!carStopSound.isPlaying()){
+                if(playOnce == false){
+                    carStopSound.play();
+                    playOnce = true;
+                }
+                
+            }
+        }
+        else{
+            carStopSound.pause();
+        }
+
         fill(255, 0, 0); // Red Text for action
         // start over
         text(hyperlinks[13], textPosX, windowHeight - 400, 800, 800);
@@ -304,6 +435,20 @@ function draw(){
     else if(state == 19){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!winSound.isPlaying()){
+                if(playOnce == false){
+                    winSound.play();
+                    playOnce = true;
+                }
+                
+            }
+        }
+        else{
+            winSound.pause();
+        }
+
         // load winner image
         image(winnerImg, 300, 10, 200, 200);
 
@@ -315,11 +460,39 @@ function draw(){
     else if (state == 20){
         text(storyText[state], textPosX, textPosY, 800, 800);
 
+        // Sound Controls 
+        if(soundOn == true){
+            if(!gunCockSound.isPlaying()){
+                if(playOnce == false){
+                    gunCockSound.play();
+                    playOnce = true;
+                }
+                
+            }
+        }
+        else{
+            gunCockSound.pause();
+        }
+
         fill(255, 0, 0); // Red Text for action
         text(hyperlinks[12], textPosX, windowHeight - 400, 800, 800);
     }
     else if(state == 21){
         background(255); // White background
+
+        // Sound Controls 
+        if(soundOn == true){
+            if(!gunShotSound.isPlaying()){
+                if(playOnce == false){
+                    gunShotSound.play();
+                    playOnce = true;
+                }
+                
+            }
+        }
+        else{
+            gunShotSound.pause();
+        }
 
         // Animate blood background rectangle
         fill(255, 0, 0);
@@ -353,9 +526,7 @@ function draw(){
         text(storyText[state], textPosX, textPosY, 800, 800);
     }
 
-
     
-   
 }
 
 
@@ -376,6 +547,10 @@ function keyTyped(){
         }
         else if(typed == "walk to room" || typed == "go to room"){
             if(state == 3){
+                // Pause state 3 sound
+                if(babyDriverSound.isPlaying()){
+                    babyDriverSound.stop();
+                }
                 state++;
             }
         }
@@ -394,11 +569,18 @@ function keyTyped(){
         else if(typed == "open dresser" && state == 4){
             state++;
         }
-        else if(typed == "grab pocket knife" || typed == "take pocket knife"){
-            state++;
+        else if(typed == "grab pocket knife" || typed == "take pocket knife" || typed == "take knife" || typed == "grab pocket knife"){
+            if(state == 5){
+                state++;
+            }
+            
         }
         else if (typed == "grab gun" || typed == "take gun"){
-            state++;
+            console.log("TEST");
+            if(state == 7){
+                state++;
+            }
+            
         }
         else if (typed == "grab money" || typed == "take money"){
             state = 22;
@@ -406,6 +588,7 @@ function keyTyped(){
         }
         else if (typed == "open door" && state == 10){
             state++;
+            playOnce = false;
         }
 
         typed = "";
@@ -451,6 +634,7 @@ function mousePressed(){
         // Turn around back
         else if(state == 20){
             state = 21;
+            playOnce = false;
         }
         // Start over
         else if(state == 21 || state == 9 || state == 17 || state == 19){
@@ -511,7 +695,7 @@ function mousePressed(){
         typed = "";
     }
 
-    
-
    
 }
+
+
